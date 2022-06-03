@@ -1,11 +1,11 @@
-package com.example.countrylistexam.country.domain.provider
+package com.example.countrylistexam.country.data.provider
 
 import android.content.Context
 import com.example.countrylistexam.app.util.extension.JsonHelper
 import com.example.countrylistexam.common.domain.exception.*
 import com.example.countrylistexam.common.domain.exception.httpexception.*
-import com.example.countrylistexam.common.domain.model.NetworkResult
-import com.example.countrylistexam.common.domain.provider.NetworkResultHandler
+import com.example.countrylistexam.common.domain.model.Result
+import com.example.countrylistexam.common.data.provider.ResponseProvider
 import com.example.countrylistexam.country.data.ApiError
 import com.example.countrylistexam.country.domain.constant.ApiErrorEnum
 import com.example.countrylistexam.country.domain.exception.SomeApiSpecificException
@@ -15,19 +15,25 @@ import retrofit2.Response
 import java.io.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class NetworkResultHandlerImpl
+@Singleton
+class RestCountryResponseProvider
 @Inject
 constructor(
     @ApplicationContext
     private val context: Context
-) : NetworkResultHandler {
+) : ResponseProvider {
 
-    override suspend fun <T> handlerResponse(response: Response<T>): NetworkResult<T> {
+    override suspend fun <T, V> execute(
+        response: Response<T>,
+        transform: (T) -> V,
+        default: T
+    ): Result<V> {
         return try {
             val body = response.body()
             if (response.isSuccessful && body != null) {
-                NetworkResult.Success(body)
+                Result.Success(transform((response.body() ?: default)))
             } else {
                 handleOnError(response)
             }
@@ -36,7 +42,7 @@ constructor(
         }
     }
 
-    override suspend fun <T> handleOnError(response: Response<T>): NetworkResult<T> {
+    override suspend fun <T, V> handleOnError(response: Response<T>): Result<V> {
         val errorResponse = response.errorBody()?.toString()
         return try {
             val apiError = JsonHelper.fromJson<ApiError>(errorResponse!!)
@@ -47,13 +53,13 @@ constructor(
                 )
                 else -> UnknownErrorException(context, apiError.message)
             }
-            return NetworkResult.Error(throwable)
+            return Result.Error(throwable)
         } catch (e: Throwable) {
             throwException(e)
         }
     }
 
-    private fun <T> throwException(throwable: Throwable): NetworkResult.Error<T> {
+    private fun <T> throwException(throwable: Throwable): Result.Error<T> {
         val exception = when (throwable) {
             is HttpException -> {
                 when (throwable.code()) {
@@ -76,6 +82,6 @@ constructor(
 
             else -> SomethingWentWrongException(context, throwable.message)
         }
-        return NetworkResult.Error(exception)
+        return Result.Error(exception)
     }
 }

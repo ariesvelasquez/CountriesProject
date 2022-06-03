@@ -3,11 +3,13 @@ package com.example.countrylistexam.app.util
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class SettingsUtil
 @Inject
 constructor(
+    @ApplicationContext
     private val context: Context
 ) {
 

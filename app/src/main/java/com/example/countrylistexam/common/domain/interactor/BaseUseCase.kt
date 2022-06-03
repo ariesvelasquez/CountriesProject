@@ -1,16 +1,16 @@
 package com.example.countrylistexam.common.domain.interactor
 
-import com.example.countrylistexam.common.domain.model.NetworkResult
+import com.example.countrylistexam.common.domain.model.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 abstract class BaseUseCase<Type, in Params>() where Type : Any {
 
-    abstract suspend fun run(params: Params? = null): NetworkResult<Type>
+    abstract suspend fun run(params: Params? = null): Result<Type>
 
     fun execute(
         scope: CoroutineScope,
-        params: Params?,
+        params: Params? = null,
         onLaunch: () -> Unit = {},
         onSuccess: (Type) -> Unit,
         onError: (Throwable) -> Unit = {},
@@ -21,8 +21,8 @@ abstract class BaseUseCase<Type, in Params>() where Type : Any {
             onLaunch.invoke()
             try {
                 when (val result = run(params)) {
-                    is NetworkResult.Error -> onError.invoke(result.e)
-                    is NetworkResult.Success -> onSuccess.invoke(result.data)
+                    is Result.Error -> onError.invoke(result.e)
+                    is Result.Success -> onSuccess.invoke(result.data)
                 }
             } catch (e: Exception) {
                 onError.invoke(e)

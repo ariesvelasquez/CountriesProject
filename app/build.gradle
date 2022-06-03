@@ -1,11 +1,10 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 android {
     compileSdk 31
@@ -18,6 +17,7 @@ android {
         versionName "1.0"
 
         buildConfigField  'String', 'BASE_URL', '"https://restcountries.com/v3.1"'
+        buildConfigField  'String', 'REST_COUNTRY_API_VERSION', '"v3.1"'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,6 +51,7 @@ dependencies {
 
     // Lifecycle (ViewModel + LiveData)
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
 
     // Networking (Retrofit)
     implementation "com.squareup.retrofit2:retrofit:2.6.0"
