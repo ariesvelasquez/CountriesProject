@@ -1,7 +1,7 @@
 package com.example.countrylistexam.core.di
 
 import com.example.countrylistexam.core.common.data.provider.ResponseProvider
-import com.example.countrylistexam.country.data.source.remote.provider.RestCountryResponseProvider
+import com.example.countrylistexam.country.data.source.remote.rest_country_remote.provider.RestCountryResponseProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

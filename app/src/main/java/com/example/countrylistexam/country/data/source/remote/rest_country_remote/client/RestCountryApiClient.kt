@@ -1,4 +1,4 @@
-package com.example.countrylistexam.country.data.source.remote.client
+package com.example.countrylistexam.country.data.source.remote.rest_country_remote.client
 
 import com.example.countrylistexam.country.data.model.CountryDto
 import retrofit2.Response
