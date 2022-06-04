@@ -2,7 +2,6 @@ package com.example.countrylistexam.country.data.source.remote.impl
 
 import com.example.countrylistexam.BuildConfig
 import com.example.countrylistexam.country.data.model.CountryDto
-import com.example.countrylistexam.country.data.model.GetAllCountryDto
 import com.example.countrylistexam.country.data.source.remote.CountryRemote
 import com.example.countrylistexam.country.data.source.remote.client.RestCountryApiClient
 import retrofit2.Response

@@ -1,6 +1,6 @@
 package com.example.countrylistexam.core.di
 
-import com.example.countrylistexam.country.data.gateway.CountryRepositoryImpl
+import com.example.countrylistexam.country.data.repository.CountryRepositoryImpl
 import com.example.countrylistexam.country.domain.repository.CountryRepository
 import dagger.Binds
 import dagger.Module

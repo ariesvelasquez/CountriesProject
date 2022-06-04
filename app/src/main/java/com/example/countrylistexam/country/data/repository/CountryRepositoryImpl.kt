@@ -1,8 +1,8 @@
-package com.example.countrylistexam.country.data.gateway
+package com.example.countrylistexam.country.data.repository
 
 import com.example.countrylistexam.core.common.domain.model.Result
 import com.example.countrylistexam.country.data.mapper.Mapper.transform
-import com.example.countrylistexam.country.data.provider.RestCountryResponseProvider
+import com.example.countrylistexam.country.data.source.remote.provider.RestCountryResponseProvider
 import com.example.countrylistexam.country.data.source.remote.CountryRemote
 import com.example.countrylistexam.country.domain.repository.CountryRepository
 import com.example.countrylistexam.country.domain.model.Country

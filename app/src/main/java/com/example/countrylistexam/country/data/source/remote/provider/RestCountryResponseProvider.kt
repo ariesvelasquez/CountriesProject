@@ -1,4 +1,4 @@
-package com.example.countrylistexam.country.data.provider
+package com.example.countrylistexam.country.data.source.remote.provider
 
 import android.content.Context
 import com.example.countrylistexam.core.common.domain.exception.httpexception.*
