@@ -1,19 +1,14 @@
 package com.example.countrylistexam.country.data.provider
 
 import android.content.Context
-import com.example.countrylistexam.app.util.extension.JsonHelper
-import com.example.countrylistexam.common.domain.exception.*
-import com.example.countrylistexam.common.domain.exception.httpexception.*
-import com.example.countrylistexam.common.domain.model.Result
-import com.example.countrylistexam.common.data.provider.ResponseProvider
-import com.example.countrylistexam.country.data.ApiError
+import com.example.countrylistexam.core.common.domain.exception.httpexception.*
+import com.example.countrylistexam.core.common.domain.model.Result
+import com.example.countrylistexam.core.common.data.provider.ResponseProvider
 import com.example.countrylistexam.country.domain.constant.ApiErrorEnum
 import com.example.countrylistexam.country.domain.exception.SomeApiSpecificException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
-import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,6 +25,7 @@ constructor(
         transform: (T) -> V,
         default: T
     ): Result<V> {
+
         return try {
             val body = response.body()
             if (response.isSuccessful && body != null) {
@@ -38,50 +34,54 @@ constructor(
                 handleOnError(response)
             }
         } catch (e: Throwable) {
-            throwException(e)
+            Result.Error(handleThrowable(e))
         }
     }
 
     override suspend fun <T, V> handleOnError(response: Response<T>): Result<V> {
-        val errorResponse = response.errorBody()?.toString()
+
         return try {
-            val apiError = JsonHelper.fromJson<ApiError>(errorResponse!!)
-            val throwable = when (apiError.code) {
-                ApiErrorEnum.MISSING_PARAM_VALIDATION.value -> SomeApiSpecificException(
-                    context,
-                    apiError.message
-                )
-                else -> UnknownErrorException(context, apiError.message)
+            val throwable = when {
+                !response.message().isNullOrEmpty() ->
+                    handleErrorByMessage(response.code(), response.message())
+
+                else ->
+                    handleErrorByCode(response.code(), response.message())
             }
             return Result.Error(throwable)
         } catch (e: Throwable) {
-            throwException(e)
+            Result.Error(handleThrowable(e))
         }
     }
 
-    private fun <T> throwException(throwable: Throwable): Result.Error<T> {
-        val exception = when (throwable) {
-            is HttpException -> {
-                when (throwable.code()) {
-                    400 -> BadRequestException(context, throwable.message())
-                    401 -> UnAuthorizedException(context, throwable.message())
-                    403 -> ForbiddenException(context, throwable.message())
-                    404 -> NotFoundException(context, throwable.message())
-                    500 -> InternalServerError(context, throwable.message())
-                    else -> UnknownErrorException(context, throwable.message())
-                }
-            }
-
-            is SocketTimeoutException -> {
-                SocketTimeoutException(throwable.message)
-            }
-
-            is IOException -> {
-                IOException(throwable.message)
-            }
-
-            else -> SomethingWentWrongException(context, throwable.message)
+    private fun handleThrowable(throwable: Throwable): Throwable {
+        return when (throwable) {
+            is HttpException ->
+                handleErrorByCode(throwable.code(), throwable.message())
+            else -> throwable
         }
-        return Result.Error(exception)
+    }
+
+    private fun handleErrorByMessage(code: Int, message: String?) : Throwable {
+       return when {
+            message?.contains(ApiErrorEnum.MISSING_PARAM_VALIDATION.value.toChar()) == true -> {
+                SomeApiSpecificException(
+                    context,
+                    message
+                )
+            }
+            else -> handleErrorByCode(code, message)
+        }
+    }
+
+    private fun handleErrorByCode(code: Int, message: String?) : Throwable {
+        return when (code) {
+            400 -> BadRequestException(context, message)
+            401 -> UnAuthorizedException(context, message)
+            403 -> ForbiddenException(context, message)
+            404 -> NotFoundException(context, message)
+            500 -> InternalServerError(context, message)
+            else -> UnknownErrorException(context, message)
+        }
     }
 }
