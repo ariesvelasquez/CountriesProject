@@ -2,10 +2,12 @@
     <string name="app_name">CountryListExam</string>
     <string name="error_no_internet_connection">No Internet Connection</string>
     <string name="error_something_went_wrong">Something went wrong.</string>
+    <string name="error">Error</string>
     <string name="error_bad_request">Bad Request.</string>
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_forbidden">Forbidden</string>
     <string name="error_not_found">Not Found</string>
     <string name="error_unknown">Error Unknown</string>
     <string name="error_internal_server_error">Internal Server Error</string>
+    <string name="close">Close</string>
 </resources>

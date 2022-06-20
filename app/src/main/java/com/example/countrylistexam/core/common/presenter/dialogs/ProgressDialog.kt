@@ -1,4 +1,4 @@
-package com.example.countrylistexam.core.common.presenter.widgets
+package com.example.countrylistexam.core.common.presenter.dialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.example.countrylistexam.R
+import com.example.countrylistexam.databinding.DialogProgressBinding
 
 class ProgressDialog : DialogFragment() {
 
@@ -20,7 +21,11 @@ class ProgressDialog : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+    ): View {
+        return DialogProgressBinding.inflate(inflater).root
+    }
+
+    companion object {
+        fun newInstance() = ProgressDialog()
     }
 }

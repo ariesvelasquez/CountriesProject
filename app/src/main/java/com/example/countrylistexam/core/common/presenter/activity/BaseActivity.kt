@@ -1,16 +1,16 @@
 package com.example.countrylistexam.core.common.presenter.activity
 
-import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.LayoutInflater
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelLazy
 import androidx.viewbinding.ViewBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.countrylistexam.R
+import com.example.countrylistexam.core.common.presenter.dialogs.ProgressDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-@AndroidEntryPoint
 abstract class BaseActivity<VB : ViewBinding> :
     AppCompatActivity() {
 
@@ -19,25 +19,54 @@ abstract class BaseActivity<VB : ViewBinding> :
 
     abstract val bindingInflater: (LayoutInflater) -> VB
 
+    private var progressDialog: ProgressDialog? = null
 
-    protected open fun beforeLayout(savedInstanceState: Bundle?) = Unit
-    protected open fun afterLayout(savedInstanceState: Bundle?) = Unit
-    protected open fun onViewModelBound() = Unit
-    protected open fun onViewsBound() = Unit
-    protected open fun onInitializeListener() = Unit
+    protected open fun initIntentData(savedInstanceState: Bundle?) = Unit
+    protected open fun onSetLayout(savedInstanceState: Bundle?) = Unit
+    protected open fun initDataObservables() = Unit
+    protected open fun initViews() = Unit // Initialize adapters, etc.
+    protected open fun initViewEventListeners() = Unit
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        beforeLayout(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initIntentData(savedInstanceState)
         bindContentLayout()
-        afterLayout(savedInstanceState)
-        onViewModelBound()
-        onViewsBound()
-        onInitializeListener()
+        onSetLayout(savedInstanceState)
+        initDataObservables()
+        initViews()
+        initViewEventListeners()
     }
 
     private fun bindContentLayout() {
         binding = bindingInflater.invoke(layoutInflater)
         setContentView(binding.root)
+    }
+
+    fun showProgressDialog(tag: String) {
+        progressDialog = ProgressDialog.newInstance()
+        progressDialog?.show(supportFragmentManager, tag)
+    }
+
+    fun dismissProgressDialog() {
+        progressDialog?.dismiss()
+    }
+
+    fun handleOnError(throwable: Throwable) {
+        showDialog(message = throwable.message)
+    }
+
+    fun showDialog(
+        title: String? = getString(R.string.error),
+        message: String? = getString(R.string.error_something_went_wrong)
+    ) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(
+                R.string.close
+            ) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 }
